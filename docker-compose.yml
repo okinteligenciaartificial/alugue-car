@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    networks:
+      - rental-network
+    environment:
+      - JWT_SECRET=your-secret-key-change-this
+      - DB_HOST=okconnect_postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=OK4ut0MiCaoX
+      - DB_NAME=alugue_car_v3
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - rental-network
+    depends_on:
+      - backend
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  rental-network:
+    external: true
