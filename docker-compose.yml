@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   alugue-car-backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
     restart: always
-    ports:
-      - "17251:3000"
+    expose:
+      - 3000
     environment:
       - DB_HOST=pgbouncer
       - DB_PORT=5432
@@ -28,8 +26,8 @@ services:
     restart: always
     depends_on:
       - alugue-car-backend
-    ports:
-      - "17250:80"
+    expose:
+      - 80
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.alugue-car-frontend.rule=Host(`alugue-car.okconnect.com.br`)"
