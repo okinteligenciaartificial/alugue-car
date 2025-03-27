@@ -1,6 +1,5 @@
 FROM node:20-alpine
 
-<<<<<<< HEAD
 # Criar usuário não-root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
@@ -25,13 +24,4 @@ USER appuser
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
-=======
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-EXPOSE 3000
->>>>>>> 891f235cf1aa62efe8d618df22d7938b6ec9cb92
 CMD ["node", "dist/server/index.js"]
