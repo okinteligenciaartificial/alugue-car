@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  alugue-car-frontend:
+    image: ghcr.io/okinteligenciaartificial/alugue-car-frontend:latest
+    networks:
+      - web
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - VIRTUAL_HOST={{.Env.FRONTEND_DOMAIN}}
+      - LETSENCRYPT_HOST={{.Env.FRONTEND_DOMAIN}}
+      - LETSENCRYPT_EMAIL={{.Env.ADMIN_EMAIL}}
+
+  alugue-car-backend:
+    image: ghcr.io/okinteligenciaartificial/alugue-car-backend:latest
+    networks:
+      - web
+      - internal
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - DB_HOST={{.Env.DB_HOST}}
+      - DB_PORT={{.Env.DB_PORT}}
+      - DB_USER={{.Env.DB_USER}}
+      - DB_PASSWORD={{.Env.DB_PASSWORD}}
+      - DB_NAME={{.Env.DB_NAME}}
+      - JWT_SECRET={{.Env.JWT_SECRET}}
+      - PORT=3000
+      - NODE_ENV=production
+      - VIRTUAL_HOST={{.Env.API_DOMAIN}}
+      - LETSENCRYPT_HOST={{.Env.API_DOMAIN}}
+      - LETSENCRYPT_EMAIL={{.Env.ADMIN_EMAIL}}
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false

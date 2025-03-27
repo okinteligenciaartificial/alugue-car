@@ -1,0 +1,27 @@
+FROM node:20-alpine
+
+# Criar usuário não-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY package*.json ./
+
+# Instalar dependências com cache em camada separada
+RUN npm ci --only=production
+
+# Copiar arquivos do projeto
+COPY . .
+
+# Compilar TypeScript
+RUN npm run build
+
+# Mudar para usuário não-root
+USER appuser
+
+# Expor porta 3000
+EXPOSE 3000
+
+# Comando para iniciar a aplicação
+CMD ["node", "dist/server/index.js"]
