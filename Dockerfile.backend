@@ -8,8 +8,9 @@ WORKDIR /app
 # Copiar arquivos de dependências
 COPY package*.json ./
 
-# Instalar dependências com cache em camada separada
-RUN npm ci --only=production
+# Comentario para quebrar o cache: ${TIMESTAMP}
+# Instalar TODAS as dependências (incluindo DevDependencies) para permitir o build
+RUN npm install
 
 # Copiar arquivos do projeto
 COPY . .

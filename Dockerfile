@@ -3,8 +3,9 @@ FROM node:20-alpine as builder
 WORKDIR /app
 COPY package*.json ./
 
-# Instalar dependências com cache em camada separada
-RUN npm ci --only=production
+# Comentário para quebrar o cache: ${TIMESTAMP}
+# Instalar TODAS as dependências (incluindo DevDependencies) para permitir o build
+RUN npm install
 
 # Copiar arquivos do projeto
 COPY . .
