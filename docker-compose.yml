@@ -12,7 +12,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    command: sh -c "npm install && node src/server/index.ts"
+    command: sh -c "npm install && npx ts-node src/server/index.ts"
     restart: always
     expose:
       - 3000
