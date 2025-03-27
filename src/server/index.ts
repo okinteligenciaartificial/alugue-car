@@ -73,6 +73,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
       { expiresIn: '24h' }
     );
 
+
     await pool.query(
       'UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = $1',
       [user.id]
