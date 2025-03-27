@@ -1,92 +1,36 @@
 version: '3.8'
 
 services:
-  backend:
-    image: ${REGISTRY:-localhost}/alugue-car-backend:${TAG:-latest}
+  alugue-car-backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
-      args:
-        NODE_ENV: production
+    restart: always
     ports:
-      - "3000:3000"
-    networks:
-      - rental-network
+      - "17251:3000"
     environment:
+      - DB_HOST=pgbouncer
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=OK4ut0MiCaoX
+      - DB_NAME=alugue_car_v3
+      - JWT_SECRET=UaXXghCUgW+dSU3rD8KXL5q9aNt2x8CPxJyWn8bOQjDLvAzCnwsGr4aM+2Y54kUZX/kP8qXGUIOb+IqGYDF9kA==
       - NODE_ENV=production
-      - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-    deploy:
-      mode: replicated
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
-        failure_action: rollback
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alugue-car-backend.rule=Host(`api.alugue-car.okconnect.com.br`)"
+      - "traefik.http.services.alugue-car-backend.loadbalancer.server.port=3000"
 
-  frontend:
-    image: ${REGISTRY:-localhost}/alugue-car-frontend:${TAG:-latest}
+  alugue-car-frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NODE_ENV: production
-    ports:
-      - "80:80"
-    networks:
-      - rental-network
+    restart: always
     depends_on:
-      - backend
-    deploy:
-      mode: replicated
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
-        failure_action: rollback
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
-      resources:
-        limits:
-          cpus: '0.30'
-          memory: 256M
-        reservations:
-          cpus: '0.15'
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-networks:
-  rental-network:
-    external: true
+      - alugue-car-backend
+    ports:
+      - "17250:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alugue-car-frontend.rule=Host(`alugue-car.okconnect.com.br`)"
+      - "traefik.http.services.alugue-car-frontend.loadbalancer.server.port=80"
