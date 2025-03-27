@@ -1,8 +1,10 @@
 services:
   alugue-car-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
+    image: node:18-alpine # Usando Node 18 para evitar problemas de compatibilidade
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -c "npm install && node src/server/index.ts"
     restart: always
     expose:
       - 3000
@@ -20,9 +22,10 @@ services:
       - "traefik.http.services.alugue-car-backend.loadbalancer.server.port=3000"
 
   alugue-car-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nginx:alpine
+    volumes:
+      - ./public:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     restart: always
     depends_on:
       - alugue-car-backend
